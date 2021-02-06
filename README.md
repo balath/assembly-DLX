@@ -7,15 +7,15 @@ La Prueba de Evaluación a Distancia (PED) consistirá en la programación en el
 El  bucle  implementa  la  operación  vectorial  __Y:=Y+a\*X__  para  un  vector  de  longitud  R4/8  elementos  (R4 contiene  la  longitud  en  bytes  del  total  de  elementos,  teniendo  cada  elemento  8  bytes  de  longitud  al  ser  doble  precisión).  El  código  del  bucle  en  ensamblador escalar para el procesador DLXV es el siguiente:
 
 ```assembly
-inicio:			LD    F2,0(R1)      ; carga X(i)                     
-		MULTD F4,F2,F0      ; multiplica a*X(i)                     
-		LD    F6,0(R2)      ; carga Y(i)                     
-		ADDD  F6,F4,F6      ; suma a*X(i)+Y(i)                     
-		SD    0(R2),F6      ; almacena Y(i)                     
-		ADDI  R1,R1,8       ; incrementa índice X                     
-		ADDI  R2,R2,8       ; incremente índice Y                     
-		SGT   R3,R1,R4      ; test por si finalizado                     
-		BEQZ  R3,inicio     ; bucle si no finalizado
+inicio:	LD    F2,0(R1)      ; carga X(i)                     
+	MULTD F4,F2,F0      ; multiplica a*X(i)                     
+	LD    F6,0(R2)      ; carga Y(i)                     
+	ADDD  F6,F4,F6      ; suma a*X(i)+Y(i)                     
+	SD    0(R2),F6      ; almacena Y(i)                     
+	ADDI  R1,R1,8       ; incrementa índice X                     
+	ADDI  R2,R2,8       ; incremente índice Y                     
+	SGT   R3,R1,R4      ; test por si finalizado                     
+	BEQZ  R3,inicio     ; bucle si no finalizado
 ```
 
 Utilizando el simulador del procesador DLXV, denominado WinDLXV, disponible en el curso virtual, se pide que:
