@@ -1,6 +1,6 @@
 ;
-; Título:		BUCLE_VECTORIAL.S
-; Tarea:		Prueba de Evaluación a Distancia - apartado c) 
+; Título:		BUCLE_ESCALAR.S
+; Tarea:		Prueba de Evaluación a Distancia - apartado a) 
 ; Asignatura:	Ingeniería de Computadores II
 ; Curso:		2020-21
 ; Alumno:		Sergio Flor García
@@ -62,29 +62,23 @@ Y:         .double 0, 1, 2, 3, 4, 5, 6, 7
 		   .double 184, 185, 186, 187, 188, 189
 
 
-a:         .double 2.0   
+a:         .double 2.0    
 
            .text
-        ADDI   R1,R0,0x1000       ; Carga la dirección del primer elemento de X en R1.
-        ADDI   R2,R0,0x15F0       ; Carga la dirección del primer elemento de Y en R2.
-        LD     F2,0x1BE0(R0)      ; Carga la dirección del escalar a en F1.
-        ADDI   R3,R0,62          ; Elementos de la primera sección(n mod MVL).
-        ADDI   R6,R0,64          ; Elementos del resto de secciones(MVL).
-        ADDI   R8,R0,8           ; Tamaño por elemento en bytes.
-        ADDI   R4,R0,1520        ; Longitud del vector X en bytes(n * 8).
-        ADD    R4,R4,R1           ; Cálculo y carga en R4 del fin del vector X.
-        MULT   R5,R3,R8           ; Cálculo y carga en R5 de la longitud de la sección.
-        MOVI2S VLR,R3             ; Modifica el VLR para la primera sección.
-inicio: LV     V1,0(R1)           ; Carga en V1 la sección del vector X.
-        LV     V3,0(R2)           ; Carga en V2 la sección del vector Y.
-        MULTSV V2,F2,V1           ; Multiplica a*X.
-        ADDV   V4,V3,V2           ; Suma a*X+Y.
-        SV     0(R2),V4           ; Almacena en memoria la sección del vector Y.
-        ADD    R1,R1,R5           ; Cálculo de la siguiente dirección de X.
-        ADD    R2,R2,R5           ; Cálculo de la siguiente dirección de Y
-        MULT   R5,R6,R8           ; Cálculo y carga en R5 de la longitud de la siguiente sección.
-        MOVI2S VLR,R6             ; Actualiza el VLR al MVL.
-        SUB    R10,R4,R1          ; Calcula los bytes que quedan por procesar.
-        BNEZ   R10,inicio         ; Comprueba la condición de final del bucle.
-fin:    trap 6                    ; Fin del programa.
+main:      ADDI  R1,R0,0x1000       ; Carga la dirección del primer elemento de X en R1.
+           ADDI  R2,R0,0x15F0       ; Carga la dirección del primer elemento de Y en R2.
+           LD    F0,0x1BE0(R0)      ; Carga la dirección del escalar en F0.
+           ADDI  R4,R2,0            ; Cálculo y carga en R4 del fin del vector X.
+inicio:    LD    F2,0(R1)           ; Carga X[i].
+           MULTD F4,F2,F0           ; Multiplica a*X[i].
+           ADDI  R1,R1,8            ; Incrementa índice X.
+           LD    F6,0(R2)           ; Carga Y[i].
+           ADD   R5,R0,R2           ; Salva posición índice Y.
+           ADDI  R2,R2,8            ; Incrementa índice Y.
+           ADDD  F6,F4,F6           ; Suma a*X[i]+Y[i].
+           SD    0(R5),F6           ; Almacena Y[i].
+           SGT   R3,R1,R4           ; Comprueba si el índice del vector X ha llegado al final.
+           BEQZ  R3,inicio          ; Comprueba la condición de final del bucle.
+
+fin:       trap 6                   ; Fin del programa.
 	    

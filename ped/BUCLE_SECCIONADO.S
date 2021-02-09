@@ -26,14 +26,7 @@ X:         .double 0, 1, 2, 3, 4, 5, 6, 7
 		   .double 104, 105, 106, 107, 108, 109, 110, 111
 		   .double 112, 113, 114, 115, 116, 117, 118, 119
 		   .double 120, 121, 122, 123, 124, 125, 126, 127
-		   .double 128, 129, 130, 131, 132, 133, 134, 135
-		   .double 136, 137, 138, 139, 140, 141, 142, 143
-		   .double 144, 145, 146, 147, 148, 149, 150, 151
-		   .double 152, 153, 154, 155, 156, 157, 158, 159
-		   .double 160, 161, 162, 163, 164, 165, 166, 167
-		   .double 168, 169, 170, 171, 172, 173, 174, 175
-		   .double 176, 177, 178, 179, 180, 181, 182, 183
-		   .double 184, 185, 186, 187, 188, 189
+		   .double 128, 129, 130
 		   
 
 Y:         .double 0, 1, 2, 3, 4, 5, 6, 7		   
@@ -52,32 +45,43 @@ Y:         .double 0, 1, 2, 3, 4, 5, 6, 7
 		   .double 104, 105, 106, 107, 108, 109, 110, 111
 		   .double 112, 113, 114, 115, 116, 117, 118, 119
 		   .double 120, 121, 122, 123, 124, 125, 126, 127
-		   .double 128, 129, 130, 131, 132, 133, 134, 135
-		   .double 136, 137, 138, 139, 140, 141, 142, 143
-		   .double 144, 145, 146, 147, 148, 149, 150, 151
-		   .double 152, 153, 154, 155, 156, 157, 158, 159
-		   .double 160, 161, 162, 163, 164, 165, 166, 167
-		   .double 168, 169, 170, 171, 172, 173, 174, 175
-		   .double 176, 177, 178, 179, 180, 181, 182, 183
-		   .double 184, 185, 186, 187, 188, 189
-
+		   .double 128, 129, 130
 
 a:         .double 2.0    
 
            .text
 main:      ADDI  R1,R0,0x1000       ; Carga la dirección del primer elemento de X en R1.
-           ADDI  R2,R0,0x15F0       ; Carga la dirección del primer elemento de Y en R2.
-           LD    F0,0x1BE0(R0)      ; Carga la dirección del escalar en F0
+           ADDI  R2,R0,0x1418       ; Carga la dirección del primer elemento de Y en R2.
+           LD    F0,0x1830(R0)      ; Carga la dirección del escalar en F0.
            ADDI  R4,R2,0            ; Cálculo y carga en R4 del fin del vector X.
-inicio:    LD    F2,0(R1)           ; Carga X[i]
-           MULTD F4,F2,F0           ; Multiplica a*X[i]
-           LD    F6,0(R2)           ; Carga Y[i]
-           ADDD  F6,F4,F6           ; Suma a*X[i]+Y[i]
-           SD    0(R2),F6           ; Almacena Y[i]
-           ADDI  R1,R1,8            ; Incrementa índice X
-           ADDI  R2,R2,8            ; Incrementa índice Y
-           SGT   R3,R1,R4           ; Comprueba si el índice del vector X ha llegado al final.
-           BEQZ  R3,inicio          ; Comprueba la condición de final del bucle.
+           ADDI  R5,R0,2            ; Resto del desenrrollamiento, en número de elementos(n mod 3).
+resto:     LD    F2,0(R1)           ; Carga X[i].
+           MULTD F4,F2,F0           ; Multiplica a*X[i].
+           LD    F6,0(R2)           ; Carga Y[i].
+           ADDD  F6,F4,F6           ; Suma a*X[i]+Y[i].
+           SD    0(R2),F6           ; Almacena Y[i].
+           ADDI  R1,R1,8            ; Incrementa índice X.
+           ADDI  R2,R2,8            ; Incrementa índice Y.
+           SUBI  R5,R5,1            ; Comprueba si el índice del vector X ha llegado al final.
+           BNEZ  R5,resto           ; Comprueba la condición de final del bucle.   
+bucle:     LD    F2,0(R1)           ; Carga X[i].
+           MULTD F4,F2,F0           ; Multiplica a*X[i].
+           LD    F6,0(R2)           ; Carga Y[i].
+           ADDD  F6,F4,F6           ; Suma a*X[i]+Y[i].
+           SD    0(R2),F6           ; Almacena Y[i].
+           LD    F8,8(R1)           ; Carga X[i].
+           MULTD F10,F8,F0          ; Multiplica a*X[i].
+           LD    F12,8(R2)          ; Carga Y[i].
+           ADDD  F12,F10,F12        ; Suma a*X[i]+Y[i].
+           SD    8(R2),F12          ; Almacena Y[i].
+           LD    F14,0(R1)          ; Carga X[i].
+           MULTD F16,F14,F0         ; Multiplica a*X[i].
+           LD    F18,0(R2)          ; Carga Y[i].
+           ADDD  F18,F16,F18        ; Suma a*X[i]+Y[i].
+           SD    0(R2),F18          ; Almacena Y[i].
+           ADDI  R1,R1,24           ; Incrementa índice X.
+           ADDI  R2,R2,24           ; Incrementa índice Y.
+           SGE   R3,R1,R4           ; Comprueba si el índice del vector X ha llegado al final.
+           BEQZ  R3,bucle           ; Comprueba la condición de final del bucle.
 
-fin:       trap 6                   ; Fin del programa
-	    
+fin:       trap 6                   ; Fin del programa.
